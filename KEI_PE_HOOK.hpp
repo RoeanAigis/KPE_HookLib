@@ -108,7 +108,7 @@ namespace KPE
         }
     }
 
-    // Enable's ProcessEvent Hook.
+    // Enables ProcessEvent Hook.
 	static void Enable()
 	{
         void** Engine_vTable = (void**)UEngine::GetEngine()->VTable;
@@ -136,7 +136,7 @@ namespace KPE
         }
 	}
 
-    // Disable's ProcessEvent Hook.
+    // Disables ProcessEvent Hook.
     static void Disable()
     {
         for (int i = 0; i < UObject::GObjects->Num(); i++)
