@@ -179,3 +179,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
     return TRUE;
 }
 ```
+
+### Extra resources.
+[Using the SDK](https://github.com/Encryqed/Dumper-7/blob/main/UsingTheSDK.md)
