@@ -129,8 +129,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 using namespace SDK;
 using namespace SDK::Params;
 
-static HMODULE mainThread;
-
 DWORD MainThread(HMODULE Module)
 {
     /* Code to open a console window */
@@ -157,7 +155,7 @@ DWORD MainThread(HMODULE Module)
     {
         if (GetAsyncKeyState(VK_INSERT))
         {
-            FreeLibraryAndExitThread(mainThread, 0);
+            FreeLibraryAndExitThread(Module, 0);
         }
     }
 
@@ -170,7 +168,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
     {
     case DLL_PROCESS_ATTACH:
         CreateThread(0, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, 0);
-        mainThread = hModule;
         break;
     case DLL_PROCESS_DETACH:
         KPE::Disable();
