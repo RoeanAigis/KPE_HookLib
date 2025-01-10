@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK.hpp"
+#include "SDK/Engine_classes.hpp"
 using namespace SDK;
 
 using UFHook = std::function<bool(UObject*, UFunction*, void*)>;
