@@ -31,7 +31,12 @@ static std::vector<std::string> pe_blacklist = {
     "EndPlay",
     "WBP_",
     "Widget",
-    "BP_Menu"
+    "BP_Menu",
+    "UpdateBP",
+    "ProcessInput",
+    "OnUIDimensionsChangedBP",
+    "RuntimeTime",
+    "PerformConditionCheckAI"
 };
 
 // THIS IS AN INTERNAL FUNCTION SHOULD NOT BE USED OUTSIDE OF THIS CLASS!
@@ -76,24 +81,25 @@ namespace KPE
     static void INTERNAL_FUNCTION_PE_Hook(UObject* Object, UFunction* Function, void* Parms)
     {
         auto name = Function->GetFullName();
-        auto objName = Object->GetName();
 
-        
-        auto blacklisted = false;
-        for (int i = 0; i < pe_blacklist.size(); i++)
+        if (ShouldDoLogging)
         {
-            if (name.contains(pe_blacklist[i]) || objName.contains(pe_blacklist[i]))
+            auto blacklisted = false;
+            for (int i = 0; i < pe_blacklist.size(); i++)
             {
-                blacklisted = true;
-                break;
+                if (name.contains(pe_blacklist[i]))
+                {
+                    blacklisted = true;
+                    break;
+                }
+            }
+
+            if (!blacklisted)
+            {
+                std::cout << "[PE] " << name << "\n";
             }
         }
 
-        if (!blacklisted && ShouldDoLogging)
-        {
-            std::cout << "[PE] [" << objName << "] " << name << "\n";
-        }
-        
         if (hooks.find(name) != hooks.end())
         {
             auto& hook = hooks[name];
@@ -109,8 +115,8 @@ namespace KPE
     }
 
     // Enables ProcessEvent Hook.
-	static void Enable()
-	{
+    static void Enable()
+    {
         void** Engine_vTable = (void**)UEngine::GetEngine()->VTable;
         oProcessEvent = reinterpret_cast<decltype(oProcessEvent)>(Engine_vTable[Offsets::ProcessEventIdx]);
         for (int i = 0; i < UObject::GObjects->Num(); i++)
@@ -123,6 +129,8 @@ namespace KPE
             if (!Obj->IsDefaultObject())
                 continue;
 
+            if (Obj->GetName().contains("Delegate")) continue; // WuWa 4.26
+
             void** vTable = reinterpret_cast<void**>(Obj->VTable);
             DWORD oldProtect;
             if (VirtualProtect(&vTable[Offsets::ProcessEventIdx], sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect))
@@ -134,7 +142,7 @@ namespace KPE
                 }
             }
         }
-	}
+    }
 
     // Disables ProcessEvent Hook.
     static void Disable()
